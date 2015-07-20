@@ -12,6 +12,30 @@
 
 using namespace std;
 
+struct registro{
+ char celular[10];
+ char CURP[18];
+ char partido[3];
+ char separador;
+} regis;
+
+char* toJSON(){
+	char * super_string=NULL;
+
+	super_string = (char*)malloc(64*sizeof(char));
+
+	memcpy(&(super_string[0]),"{\"curp\":\"",9); 
+	memcpy(&(super_string[9]),regis.CURP,18); 
+	memcpy(&(super_string[27]),"\",\"phone\":\"",11); 
+	memcpy(&(super_string[38]),regis.celular,10); 
+
+	memcpy(&(super_string[48]),"\",\"party\":\"",11); 
+	memcpy(&(super_string[59]),regis.partido,3); 
+	memcpy(&(super_string[62]),"\"}",2);
+
+	return super_string;
+}
+
 char* randChar(){
 	char* nums = "1234567890";
 
@@ -39,36 +63,35 @@ int main(int argc, char* argv[]){
 		return 0;
 	}
 
-
 	srand(time(0));
-
 	SocketDatagram server(port, Interactive);
 
 	for(int i = 0; i < votes; i++){
 
-		string builder = "{\"curp\":\"AAAA";
-		for(int i = 0; i < 6;i++){
-			builder.append(randChar());	
-		}
-		builder.append("AAAAAA00\", \"phone\":\"");
+		string phone = "";
 		for(int i = 0; i < 10;i++){
-			builder.append(randChar());	
+			phone.append(randChar());	
 		}
-		builder.append("\", \"party\":\"");
-		builder.append(party);
-		builder.append("\"}");
 
-		char* vote = (char*)builder.c_str();
+		string curp = "AAAA";
+		for(int i = 0; i < 6;i++){
+			curp.append(randChar());	
+		}
+		curp.append("AAAAAA00");
 
-		PackageDatagram request(vote, sizeof(char)*66, host, port);
+		strcpy(regis.celular, phone.c_str());
+		strcpy(regis.CURP, curp.c_str()); 
+		strcpy(regis.partido, party);
+
+		char* vote = toJSON();
+
+		PackageDatagram request(vote, sizeof(char)*64, host, port);
 		server.send(request);
 
-		PackageDatagram response(sizeof(char)*3);
-		server.receive(response);
+		//PackageDatagram response(sizeof(char)*2);
+		//server.receive(response);
 
-		char* data = response.getData();
-		printf("RESPONSE: %s\n", data);
+		//char* data = response.getData();
+		//printf("RESPONSE: %s\n", data);
 	}
-
-
 }
