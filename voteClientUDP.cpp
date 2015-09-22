@@ -88,10 +88,10 @@ int main(int argc, char* argv[]){
 		PackageDatagram request(vote, sizeof(char)*64, host, port);
 		server.send(request);
 
-		//PackageDatagram response(sizeof(char)*2);
-		//server.receive(response);
+		PackageDatagram response(sizeof(char)*2);
+		server.receive(response);
 
-		//char* data = response.getData();
-		//printf("RESPONSE: %s\n", data);
+		char* data = response.getData();
+		printf("RESPONSE: %s\n", data);
 	}
 }
